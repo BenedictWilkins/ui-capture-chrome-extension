@@ -30,7 +30,7 @@ FILES = []
 INDEX = 0
 
 
-def load_annotated_image(image_file: Path, ann_file: Path):
+def load_annotated_image(image_file: Path, ann_file: Path):  # noqa
     # image_file = image_file.with_name("test").with_suffix(".png")
     # ann_file = ann_file.with_name("test").with_suffix(".json")
 
@@ -52,7 +52,7 @@ def load_annotated_image(image_file: Path, ann_file: Path):
     # return np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8), []
 
 
-def _next_image():
+def _next_image():  # noqa
     # TODO use a class to encapsulate all this garbage
     files = list(DIRECTORY.glob("*.png"))
     global INDEX
@@ -62,7 +62,7 @@ def _next_image():
     return None
 
 
-def _prev_image():
+def _prev_image():  # noqa
     global INDEX, FILES
     if len(FILES) > 0:
         INDEX = (INDEX - 1) % len(FILES)
@@ -70,7 +70,7 @@ def _prev_image():
     return None
 
 
-def select_directory(directory, glob="*.png"):
+def select_directory(directory, glob="*.png"):  # noqa
     global DIRECTORY, FILES, INDEX
     directory = Path(directory).expanduser()
     print(directory, directory.exists(), directory.is_dir())

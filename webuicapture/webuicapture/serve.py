@@ -10,16 +10,15 @@ uvicorn webuicapture.serve:app --reload --port 7659
 after installing webuicapture with pip.
 """
 
-from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .data import CaptureData
-from typing import Any
+from pydantic import BaseModel
 import time
-import json
 
 app = FastAPI()
 
-# only allow requests from localhost
+# only allow requests from localhost TODO
 app.add_middleware(
     CORSMiddleware,
     # allow_origins=["http://localhost", "http://127.0.0.1"],  # Allow only localhost
@@ -28,10 +27,9 @@ app.add_middleware(
     allow_methods=["*"],  # Allow all methods
     allow_headers=["*"],  # Allow all headers
 )
-from pydantic import BaseModel
 
 
-class PingMessage(BaseModel):
+class PingMessage(BaseModel):  # noqa
     message: str
 
 
@@ -48,8 +46,8 @@ INDEX = 0
 
 @app.post("/upload")
 async def upload_data(request: Request):
-    global INDEX
     """Endpoint for uploading capture data from browser extensions."""
+    global INDEX
     # The raw request is needed here to prevent fastapi validation errors... (some issue with json serialization schema)
     try:
         data = CaptureData.model_validate_json(await request.body(), context={})
