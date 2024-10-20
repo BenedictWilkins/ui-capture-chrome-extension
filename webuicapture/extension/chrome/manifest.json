@@ -4,9 +4,19 @@
     "version": "1.0",
     "description": "Inspect UI elements and highlight them on the page.",
     "permissions": [
-        "activeTab"
+        "activeTab",
+        "scripting",
+        "downloads",
+        "tabs"
     ],
-    "devtools_page": "devtools.html",
+    "host_permissions": [
+        "http://localhost:7659/*",
+        "https://localhost:7659/*",
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "content_scripts": [
         {
             "matches": [
@@ -14,6 +24,9 @@
             ],
             "js": [
                 "content.js"
+            ],
+            "css": [
+                "styles.css"
             ]
         }
     ],

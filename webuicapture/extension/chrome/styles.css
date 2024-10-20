@@ -1,0 +1,48 @@
+/* styles.css */
+
+.overlay {
+    position: absolute;
+    background-color: rgba(0, 128, 255, 0.05);
+    border: 2px solid rgba(0, 128, 255, 0.8);
+    z-index: 9998;
+    pointer-events: none;
+    display: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 0;
+    height: 0;
+    top: 0;
+    left: 0;
+    transform: none;
+    transition: none;
+    font-size: initial;
+    font-family: initial;
+    line-height: normal;
+    color: initial;
+    text-align: initial;
+    text-decoration: none;
+    text-transform: none;
+    letter-spacing: normal;
+    word-spacing: normal;
+    white-space: normal;
+    vertical-align: baseline;
+    border-radius: 0;
+    box-shadow: none;
+    opacity: 1;
+    visibility: visible;
+    overflow: visible;
+    clip: auto;
+    clear: none;
+    float: none;
+    cursor: default;
+    outline: none;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: auto;
+    background-clip: border-box;
+    background-origin: padding-box;
+    background-attachment: scroll;
+    background-blend-mode: normal;
+}
