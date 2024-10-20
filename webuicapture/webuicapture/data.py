@@ -195,6 +195,7 @@ class CaptureData(BaseModel):
             f.write(self.model_dump_json(indent=2))
         # write image data
         self.image.save(image_path)
+        return image_path, json_path
 
 
 if __name__ == "__main__":

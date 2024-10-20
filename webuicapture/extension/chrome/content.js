@@ -53,26 +53,21 @@
 // });
 
 
-// Click event handler to trigger screenshot
-document.addEventListener('click', () => {
+document.addEventListener('click', (event) => {
+    if (!event.ctrlKey) {
+        return;
+    }
     console.log("Sending capture message!", window.location.href);
     // chrome.runtime.sendMessage({ action: 'ping', message: "alive" })
-    const pixelRatio = window.devicePixelRatio || 1;
+    //const pixelRatio = window.devicePixelRatio || 1;
     // do it in pixel space, this makes things easier later when processing the image
-    const viewRect = [
-        window.scrollX * pixelRatio,
-        window.scrollY * pixelRatio,
-        (window.scrollX + window.innerWidth) * pixelRatio,
-        (window.scrollY + window.innerHeight) * pixelRatio
-    ];
     chrome.runtime.sendMessage({
         action: 'capture',
-        viewRect: viewRect, // this should be checked against the image size for sanity
         data: {
             url: window.location.href,
             timestamp: new Date().toISOString(),
             // TODO: traverse the dom and collect the bbox tree
-            bbox_tree: extractLayoutTree(document.body, viewRect)
+            bbox_tree: extractLayoutTree(document.body)
         }
     });
 });
@@ -97,36 +92,28 @@ function rectangleIntersection(rect1, rect2) {
 
 // make this a function
 // Function to traverse the DOM and collect information about each element in a tree structure
-function extractLayoutTree(node, viewRect) {
+function extractLayoutTree(node) {
     // TODO need to check that the view rect doesnt change as this is computed...
-
+    if (!node.checkVisibility()) {
+        // this element is not visible (probably...) so skip it and all its children
+        return null;
+    }
     const rect = node.getBoundingClientRect();
-    if (rect.width == 0 || rect.height == 0) {
+    const elemRect = [rect.left, rect.top, rect.right, rect.bottom];
+    const viewRect = [0, 0, window.innerWidth, window.innerHeight];
+    //console.log(node.checkVisibility(), elemRect, viewRect);
+
+
+    if (!rectangleIntersection(elemRect, viewRect)) {
         // this element is not visible (probably...) so skip it.
         return null;
     }
     const pixelRatio = window.devicePixelRatio || 1;
-
-    // TODO need to make sure the user doesnt scroll before the screen capture is taken!
-    const _x1 = (rect.left + window.scrollX) * pixelRatio;
-    const _y1 = (rect.top + window.scrollY) * pixelRatio;
-    const _x2 = (rect.right + window.scrollX) * pixelRatio;
-    const _y2 = (rect.bottom + window.scrollY) * pixelRatio;
-
-    if (!rectangleIntersection([_x1, _y1, _x2, _y2], viewRect)) {
-        // this element is not visible (probably...) so skip it.
-        return null;
-    }
-
     // clip the rectangle to the viewport
-    const x1 = Math.floor(Math.max(_x1, viewRect[0]));
-    const y1 = Math.floor(Math.max(_y1, viewRect[1]));
-    const x2 = Math.floor(Math.min(_x2, viewRect[2]));
-    const y2 = Math.floor(Math.min(_y2, viewRect[3]));
-
-    console.log("viewRect", viewRect);
-    console.log("Rect", [_x1, _y1, _x2, _y2]);
-    console.log("Clipped", [x1, y1, x2, y2]);
+    const x1 = Math.floor(Math.max(elemRect[0], viewRect[0]) * pixelRatio);
+    const y1 = Math.floor(Math.max(elemRect[1], viewRect[1]) * pixelRatio);
+    const x2 = Math.floor(Math.min(elemRect[2], viewRect[2]) * pixelRatio);
+    const y2 = Math.floor(Math.min(elemRect[3], viewRect[3]) * pixelRatio);
 
     const info = {
         tag: node.tagName,
@@ -136,7 +123,7 @@ function extractLayoutTree(node, viewRect) {
     };
 
     Array.from(node.children).forEach(child => {
-        const childInfo = extractLayoutTree(child, viewRect);
+        const childInfo = extractLayoutTree(child);
         if (childInfo) {
             info.children.push(childInfo);
         }
